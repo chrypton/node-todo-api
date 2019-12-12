@@ -5,17 +5,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
-var { mongoose } = require('./db/mongoose');
-var { Todo } = require('./model/todo');
-var { User } = require('./model/user');
+let { mongoose } = require('./db/mongoose');
+let { Todo } = require('./model/todo');
+let { User } = require('./model/user');
+let { authenticate } = require('./middleware/authenticate');
 
-var app = express();
+let app = express();
 const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
-    var todo = new Todo({
+    let todo = new Todo({
         text: req.body.text
     });
 
@@ -123,6 +124,12 @@ app.post('/users', (req, res) => {
     }).catch((e) => {
       res.status(400).send(e);
     })
+});
+
+
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
 });
 
 app.listen(port, () => {
